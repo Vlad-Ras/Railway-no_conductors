@@ -1,0 +1,137 @@
+/*
+ * Steam 'n' Rails
+ * Copyright (c) 2022-2024 The Railways Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.railwayteam.railways.content.fuel.psi;
+
+import com.railwayteam.railways.mixin_interfaces.IContraptionFuel;
+import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
+import com.simibubi.create.content.contraptions.Contraption;
+import com.simibubi.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import org.jetbrains.annotations.Nullable;
+
+public class PortableFuelInterfaceBlockEntity extends PortableStorageInterfaceBlockEntity {
+
+    public PortableFuelInterfaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
+
+    @Override
+    public void startTransferringTo(Contraption contraption, float distance) {
+        MountedFluidStorageWrapper fuels = ((IContraptionFuel) contraption).railways$getFluidFuels();
+        this.fluidHandler.setWrapped(fuels != null ? fuels : new FluidTank(0));
+        this.fluidHandler.keepAlive();
+        super.startTransferringTo(contraption, distance);
+    }
+
+    @Override
+    protected void invalidateCapability() {
+        this.fluidHandler.setWrapped(new FluidTank(0));
+    }
+
+    @Override
+    protected void stopTransferring() {
+        this.fluidHandler.setWrapped(new FluidTank(0));
+        super.stopTransferring();
+    }
+
+    private final InterfaceFluidHandler fluidHandler = new InterfaceFluidHandler(new FluidTank(0));
+
+    public IFluidHandler getFluidHandler(@Nullable Direction side) {
+        return fluidHandler;
+    }
+
+    public class InterfaceFluidHandler implements IFluidHandler {
+
+        private IFluidHandler wrapped;
+
+        public InterfaceFluidHandler(IFluidHandler wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        public void setWrapped(IFluidHandler wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public int getTanks() {
+            return wrapped.getTanks();
+        }
+
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            return wrapped.getFluidInTank(tank);
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return wrapped.getTankCapacity(tank);
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, FluidStack stack) {
+            return wrapped.isFluidValid(tank, stack);
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (!isConnected())
+                return 0;
+            int fill = wrapped.fill(resource, action);
+            if (fill > 0 && action.execute())
+                keepAlive();
+            return fill;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            if (!canTransfer())
+                return FluidStack.EMPTY;
+            FluidStack drain = wrapped.drain(resource, action);
+            if (!drain.isEmpty() && action.execute())
+                keepAlive();
+            return drain;
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            if (!canTransfer())
+                return FluidStack.EMPTY;
+            FluidStack drain = wrapped.drain(maxDrain, action);
+            if (!drain.isEmpty() && action.execute())
+                keepAlive();
+            return drain;
+        }
+
+        public void keepAlive() {
+            onContentTransferred();
+        }
+
+        boolean isConnected() {
+            int timeUnit = getTransferTimeout();
+            return transferTimer >= ANIMATION && transferTimer <= timeUnit + ANIMATION;
+        }
+    }
+
+}

@@ -1,0 +1,13 @@
+{
+  "sources": [
+    {
+      "type": "directory",
+      "source": "entity/caps",
+      "prefix": "entity/caps/"
+    },
+    {
+      "type": "single",
+      "resource": "entity/slime/slime"
+    }
+  ]
+}

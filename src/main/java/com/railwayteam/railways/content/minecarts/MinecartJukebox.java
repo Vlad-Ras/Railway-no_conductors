@@ -1,0 +1,339 @@
+/*
+ * Steam 'n' Rails
+ * Copyright (c) 2022-2024 The Railways Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.railwayteam.railways.content.minecarts;
+
+import com.railwayteam.railways.registry.CREntities;
+import com.railwayteam.railways.registry.CRItems;
+import com.railwayteam.railways.util.packet.PacketSender;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.JukeboxPlayable;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
+
+public class MinecartJukebox extends MinecartBlock {
+  // Don't initialize during class load - mixins may not have run yet
+  public static Type TYPE = null;
+  
+  public static Type getJukeboxType() {
+    if (TYPE == null) {
+      TYPE = Type.valueOf("RAILWAY_JUKEBOX");
+    }
+    return TYPE;
+  }
+
+  private static final int COOLDOWN = 100; // ticks
+  private static final int PARTICLE_INTERVAL = 20; // ticks between particle spawns
+  private int cooldownCount = 0;
+  private long ticksSinceSongStarted = 0;
+
+  private ItemStack disc = ItemStack.EMPTY;
+  @OnlyIn(Dist.CLIENT)
+  private JukeboxCartSoundInstance sound;
+
+  public MinecartJukebox(EntityType<?> type, Level level) {
+    super(type, level, Blocks.JUKEBOX);
+  }
+
+  public MinecartJukebox(Level level, double x, double y, double z) {
+    super(CREntities.CART_JUKEBOX.get(), level, x, y, z, Blocks.JUKEBOX);
+  }
+
+  public int getComparatorOutput() {
+    // In 1.21, music discs use JukeboxPlayable component
+    JukeboxPlayable playable = disc.get(DataComponents.JUKEBOX_PLAYABLE);
+    if (playable != null) {
+      return playable.song().holder()
+        .map(Holder::value)
+        .map(JukeboxSong::comparatorOutput)
+        .orElse(0);
+    }
+    return 0;
+  }
+
+  @Override
+  public Type getMinecartType() {
+    return TYPE;
+  }
+
+  @Override
+  public void tick () {
+    super.tick();
+    if (cooldownCount > 0) cooldownCount--;
+
+    if (!disc.isEmpty()) {
+      if (!level().isClientSide && ticksSinceSongStarted % PARTICLE_INTERVAL == 0) {
+        spawnMusicParticles();
+      }
+      ticksSinceSongStarted++;
+    }
+  }
+
+  private void spawnMusicParticles() {
+    if (level() instanceof ServerLevel serverLevel) {
+      double offsetX = (level().getRandom().nextDouble() - 0.5) * 0.5;
+      double offsetZ = (level().getRandom().nextDouble() - 0.5) * 0.5;
+      Vec3 pos = position().add(offsetX, 1.2, offsetZ);
+      float noteColor = (float) level().getRandom().nextInt(4) / 24.0F;
+      serverLevel.sendParticles(ParticleTypes.NOTE, pos.x(), pos.y(), pos.z(), 0, noteColor, 0.0, 0.0, 1.0);
+    }
+  }
+
+  @Override
+  public void activateMinecart(int x, int y, int z, boolean active) {
+    if (active && !level().isClientSide) {
+      if (cooldownCount <= 0) {
+        cooldownCount = COOLDOWN;
+        PacketSender.updateJukeboxClientside(this, this.disc);
+      }
+    }
+  }
+
+  @Override
+  public ItemStack getPickResult() {
+    return CRItems.ITEM_JUKEBOXCART.asStack();
+  }
+
+  @NotNull
+  @Override
+  public InteractionResult interact (@NotNull Player player, @NotNull InteractionHand hand) {
+    InteractionResult ret = super.interact(player, hand);
+    if (ret.consumesAction()) return ret;
+
+    if (!level().isClientSide) {
+      if (disc.isEmpty()) { // no disc inserted
+        // get the disc from the player, if they have one
+        ItemStack handStack = player.getItemInHand(hand);
+        // In 1.21, check for JUKEBOX_PLAYABLE component instead of RecordItem
+        if (handStack.has(DataComponents.JUKEBOX_PLAYABLE)) {
+          insertRecord(handStack);
+          if (!player.isCreative()) player.setItemInHand(hand, ItemStack.EMPTY);
+          player.awardStat(Stats.PLAY_RECORD);
+        }
+        else return InteractionResult.PASS;
+      }
+      else {
+        __ejectRecord();
+      }
+    }
+    return InteractionResult.sidedSuccess(level().isClientSide);
+  }
+
+  @Override
+  protected void readAdditionalSaveData(CompoundTag compound) {
+    super.readAdditionalSaveData(compound);
+    if (compound.contains("Disc", Tag.TAG_COMPOUND)) {
+      // In 1.21, ItemStack.parseOptional returns an ItemStack directly using a HolderLookup.Provider
+      disc = ItemStack.parseOptional(level().registryAccess(), compound.getCompound("Disc"));
+    }
+  }
+
+  @Override
+  protected void addAdditionalSaveData(CompoundTag compound) {
+    super.addAdditionalSaveData(compound);
+    // In 1.21, save requires a HolderLookup.Provider
+    // Guard against saving empty ItemStacks - they cannot be serialized
+    if (!disc.isEmpty()) {
+      compound.put("Disc", disc.save(level().registryAccess()));
+    }
+  }
+
+  // Called from both client and server
+  public void insertRecord (ItemStack record) {
+    this.disc = record.copy();
+    this.ticksSinceSongStarted = 0;
+    if (content == null) {
+      content = Blocks.JUKEBOX.defaultBlockState();
+    }
+    this.content = content.setValue(JukeboxBlock.HAS_RECORD, !disc.isEmpty());
+    if (!level().isClientSide) {
+      // Only send packet if disc is not empty
+      if (!this.disc.isEmpty()) {
+        PacketSender.updateJukeboxClientside(this, this.disc);
+      }
+    } else {
+      // Client side: handle sound playback
+      if (!this.disc.isEmpty()) {
+        if (sound == null || sound.isStopped()) {
+          startPlaying();
+        } else {
+          sound.requestStop();
+        }
+      } else if (sound != null) {
+        sound.requestStop();
+      }
+    }
+  }
+
+  // serverside
+  private void __ejectRecord () {
+    if (level().isClientSide) return;
+
+    Vector3d pos = new Vector3d(
+      this.position().x + 0.5d,
+      this.position().y + 1d,
+      this.position().z + 0.5d
+    );
+    ItemEntity out = new ItemEntity(level(), pos.x, pos.y, pos.z, this.disc);
+    out.setDefaultPickUpDelay();
+    level().addFreshEntity(out);
+    insertRecord(ItemStack.EMPTY);
+  }
+
+  // serverside. Checks for side due to public method above being used clientside
+  private void __insertRecord (ItemStack record) {
+    insertRecord(record);
+  }
+
+  @OnlyIn(Dist.CLIENT)
+  // clientside
+  private void startPlaying () {
+    if (!this.disc.isEmpty()) {
+      // In 1.21, get the sound from the JukeboxPlayable component
+      JukeboxPlayable playable = disc.get(DataComponents.JUKEBOX_PLAYABLE);
+      if (playable == null) {
+        return;
+      }
+      
+      var songHolder = playable.song();
+      
+      // Try to get the holder directly first
+      var holderOptional = songHolder.holder();
+      
+      if (holderOptional.isEmpty()) {
+        // When the holder is empty in an EitherHolder, it means the ResourceKey hasn't been resolved yet
+        // We need to extract the key field via reflection and manually resolve it
+        try {
+          var holderClass = songHolder.getClass();
+          
+          // Get the 'key' field from EitherHolder
+          var keyField = holderClass.getDeclaredField("key");
+          keyField.setAccessible(true);
+          var keyValue = keyField.get(songHolder);
+          
+          if (keyValue != null) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null) {
+              var registryAccess = mc.level.registryAccess();
+              var registry = registryAccess.registryOrThrow(net.minecraft.core.registries.Registries.JUKEBOX_SONG);
+              
+              // Cast and resolve the ResourceKey
+              @SuppressWarnings("unchecked")
+              var resourceKey = (net.minecraft.resources.ResourceKey<JukeboxSong>) keyValue;
+              var resolvedHolderRef = registry.getHolder(resourceKey);
+              
+              if (resolvedHolderRef.isPresent()) {
+                // Convert Holder.Reference to Optional<Holder>
+                var holderRef = resolvedHolderRef.get();
+                holderOptional = java.util.Optional.of((Holder<JukeboxSong>) holderRef);
+              }
+            }
+          }
+        } catch (Exception e) {
+          // If resolution fails, we can't play the sound
+        }
+        
+        // If still empty, cannot play
+        if (holderOptional.isEmpty()) {
+          return;
+        }
+      }
+      
+      holderOptional
+        .map(holder -> {
+          JukeboxSong song = holder.value();
+          SoundEvent soundEvent = song.soundEvent().value();
+          return soundEvent;
+        })
+        .ifPresent(soundEvent -> {
+          if (soundEvent != null) {
+            sound = new JukeboxCartSoundInstance(soundEvent);
+            Minecraft.getInstance().getSoundManager().play(sound);
+          }
+        });
+    }
+  }
+
+  @OnlyIn(Dist.CLIENT)
+  public class JukeboxCartSoundInstance extends AbstractTickableSoundInstance {
+    public JukeboxCartSoundInstance (SoundEvent event) {
+      super(event, SoundSource.RECORDS, SoundInstance.createUnseededRandom());
+      // Initialize position
+      this.x = blockPosition().getX() + 0.5;
+      this.y = blockPosition().getY() + 0.5;
+      this.z = blockPosition().getZ() + 0.5;
+      this.looping = false;
+      this.delay = 0;
+      this.volume = 1.0f;
+      this.pitch = 1.0f;
+    }
+
+    @Override
+    public void tick () {
+      if (isRemoved()) {
+        requestStop();
+        return;
+      }
+
+      // Update position to follow the minecart
+      this.x = blockPosition().getX() + 0.5;
+      this.y = blockPosition().getY() + 0.5;
+      this.z = blockPosition().getZ() + 0.5;
+    }
+
+    public void requestStop () {
+      stop();
+    }
+  }
+
+  @Override
+  public void destroy(@NotNull DamageSource source) {
+    super.destroy(source);
+    if (!source.is(DamageTypeTags.IS_EXPLOSION) && this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS) && this.disc != null && !this.disc.isEmpty()) {
+      this.spawnAtLocation(this.disc.copy());
+      this.disc = ItemStack.EMPTY;
+    }
+  }
+}

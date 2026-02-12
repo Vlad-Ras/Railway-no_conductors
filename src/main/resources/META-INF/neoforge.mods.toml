@@ -1,0 +1,56 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+issueTrackerURL = "https://github.com/Porters-of-Railways/Railway-1.21.1/issues"
+license = "LGPL-3.0 license"
+
+[[mods]]
+modId = "railways"
+version = "${version}"
+displayName = "Create: Steam 'n' Rails 1.21.1"
+authors = "PoppyBlossom, Chameleon538"
+description = '''Unofficial port of Create: Steam 'n' Rails to 1.21.1.
+
+This mod bring all of the features from Steam 'n' Rails to a newer Minecraft version!
+'''
+logoFile = "icon.png"
+
+[[mixins]]
+config = "railways-common.mixins.json"
+
+[[mixins]]
+config = "railways.mixins.json"
+
+[[dependencies.railways]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.railways]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.railways]]
+modId="create"
+mandatory=true
+versionRange="[6.0.7,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.railways]]
+modId="hexcasting"
+type="optional"
+versionRange="[0,)"
+ordering="AFTER" # Steam 'n' Rails should load after hexcasting
+side="BOTH"
+
+[[dependencies.railways]]
+modId="voicechat"
+type="optional"
+versionRange="[0,)"
+ordering="AFTER"
+side="BOTH"
