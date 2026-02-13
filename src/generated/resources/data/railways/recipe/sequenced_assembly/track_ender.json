@@ -5,7 +5,7 @@
   },
   "results": [
     {
-      "item": "railways:track_ender"
+      "id": "railways:track_ender"
     }
   ],
   "sequence": [
@@ -26,7 +26,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_ender"
+          "id": "railways:track_incomplete_ender"
         }
       ]
     },
@@ -47,7 +47,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_ender"
+          "id": "railways:track_incomplete_ender"
         }
       ]
     },
@@ -60,12 +60,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_ender"
+          "id": "railways:track_incomplete_ender"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_ender"
+    "id": "railways:track_incomplete_ender"
   }
 }

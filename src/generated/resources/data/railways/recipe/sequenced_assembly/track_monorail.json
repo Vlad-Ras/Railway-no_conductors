@@ -6,7 +6,7 @@
   "results": [
     {
       "count": 6,
-      "item": "railways:track_monorail"
+      "id": "railways:track_monorail"
     }
   ],
   "sequence": [
@@ -22,7 +22,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_monorail"
+          "id": "railways:track_incomplete_monorail"
         }
       ]
     },
@@ -38,7 +38,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_monorail"
+          "id": "railways:track_incomplete_monorail"
         }
       ]
     },
@@ -51,12 +51,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_monorail"
+          "id": "railways:track_incomplete_monorail"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_monorail"
+    "id": "railways:track_incomplete_monorail"
   }
 }

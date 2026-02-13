@@ -5,7 +5,7 @@
   },
   "results": [
     {
-      "item": "railways:track_blackstone"
+      "id": "railways:track_blackstone"
     }
   ],
   "sequence": [
@@ -21,7 +21,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_blackstone"
+          "id": "railways:track_incomplete_blackstone"
         }
       ]
     },
@@ -37,7 +37,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_blackstone"
+          "id": "railways:track_incomplete_blackstone"
         }
       ]
     },
@@ -50,12 +50,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_blackstone"
+          "id": "railways:track_incomplete_blackstone"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_blackstone"
+    "id": "railways:track_incomplete_blackstone"
   }
 }

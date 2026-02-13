@@ -6,7 +6,7 @@
   "results": [
     {
       "count": 32,
-      "item": "railways:track_phantom"
+      "id": "railways:track_phantom"
     }
   ],
   "sequence": [
@@ -22,7 +22,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_phantom"
+          "id": "railways:track_incomplete_phantom"
         }
       ]
     },
@@ -38,7 +38,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_phantom"
+          "id": "railways:track_incomplete_phantom"
         }
       ]
     },
@@ -51,12 +51,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_phantom"
+          "id": "railways:track_incomplete_phantom"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_phantom"
+    "id": "railways:track_incomplete_phantom"
   }
 }

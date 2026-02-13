@@ -5,7 +5,7 @@
   },
   "results": [
     {
-      "item": "railways:track_stripped_bamboo"
+      "id": "railways:track_stripped_bamboo"
     }
   ],
   "sequence": [
@@ -26,7 +26,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_stripped_bamboo"
+          "id": "railways:track_incomplete_stripped_bamboo"
         }
       ]
     },
@@ -47,7 +47,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_stripped_bamboo"
+          "id": "railways:track_incomplete_stripped_bamboo"
         }
       ]
     },
@@ -60,12 +60,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_stripped_bamboo"
+          "id": "railways:track_incomplete_stripped_bamboo"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_stripped_bamboo"
+    "id": "railways:track_incomplete_stripped_bamboo"
   }
 }

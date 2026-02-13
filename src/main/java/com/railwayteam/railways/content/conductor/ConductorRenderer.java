@@ -48,7 +48,6 @@ public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorEnt
 	this.addLayer(new ConductorCapLayer<>(this));
     this.addLayer(new ConductorSecondaryHeadLayer<>(this, ctx.getModelSet(), ctx.getItemInHandRenderer()));
     this.addLayer(new ConductorToolboxLayer<>(this));
-    this.addLayer(new ConductorFlagLayer<>(this));
     this.addLayer(new ConductorRemoteLayer<>(this));
     this.addLayer(new ConductorElytraLayer<>(this, ctx.getModelSet()));
   }

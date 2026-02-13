@@ -34,10 +34,6 @@ import com.railwayteam.railways.content.buffer.headstock.HeadstockBlock;
 import com.railwayteam.railways.content.buffer.headstock.HeadstockStyle;
 import com.railwayteam.railways.content.buffer.single_deco.GenericDyeableSingleBufferBlock;
 import com.railwayteam.railways.content.buffer.single_deco.LinkPinBlock;
-import com.railwayteam.railways.content.conductor.vent.CopycatVentModel;
-import com.railwayteam.railways.content.conductor.vent.VentBlock;
-import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleFlagBlock;
-import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleItem;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlock;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlockItem;
 import com.railwayteam.railways.content.custom_bogeys.blocks.narrow.NarrowGaugeBogeyBlock;
@@ -544,26 +540,6 @@ public class CRBlocks {
                     .lang("Large Create Styled 0-12-0")
                     .register();
 
-
-
-    public static final BlockEntry<ConductorWhistleFlagBlock> CONDUCTOR_WHISTLE_FLAG =
-        REGISTRATE.block("conductor_whistle", ConductorWhistleFlagBlock::new)
-            .initialProperties(SharedProperties::wooden)
-            .properties(p -> p
-                    .mapColor(MapColor.COLOR_BROWN)
-                    .noOcclusion()
-                    .sound(SoundType.WOOD)
-                    .instabreak()
-                    .noLootTable()
-                    .noCollission()
-
-            )
-            .transform(BuilderTransformers.conductorWhistleFlag())
-            .lang("Conductor Whistle")
-            .item(ConductorWhistleItem::new)
-            .transform(customItemModel())
-            .register();
-
 //    static {
 //        REGISTRATE.startSection(AllSections.PALETTES);
 //    }
@@ -599,18 +575,6 @@ public class CRBlocks {
         .model((c, p) -> p.withExistingParent("item/" + c.getName(), Railways.asResource("block/smokestack/block_diesel")))
         .build()
         .register();
-
-    public static final BlockEntry<VentBlock> CONDUCTOR_VENT =
-        REGISTRATE.block("conductor_vent", VentBlock::create)
-            .transform(copycat())
-            .transform(BuilderTransformers.conductorVent())
-            .properties(p -> p.isSuffocating((state, level, pos) -> false))
-            .onRegister(CreateRegistrate.blockModel(() -> CopycatVentModel::create))
-            .lang("Vent Block")
-            .recipe((c, p) -> p.stonecutting(DataIngredient.items(AllBlocks.INDUSTRIAL_IRON_BLOCK.get()), RecipeCategory.TRANSPORTATION, c, 2))
-            .item()
-            .transform(customItemModel("copycat_vent"))
-            .register();
 
     public static final BlockEntry<StandardTrackBufferBlock> TRACK_BUFFER = REGISTRATE.block("buffer", StandardTrackBufferBlock::new)
         .initialProperties(SharedProperties::softMetal)

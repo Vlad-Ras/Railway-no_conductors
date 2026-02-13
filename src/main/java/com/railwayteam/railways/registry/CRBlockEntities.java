@@ -24,8 +24,6 @@ import com.railwayteam.railways.content.buffer.TrackBufferBlockEntity;
 import com.railwayteam.railways.content.buffer.WoodVariantTrackBufferBlockEntity;
 import com.railwayteam.railways.content.buffer.headstock.CopycatHeadstockBlockEntity;
 import com.railwayteam.railways.content.buffer.headstock.HeadstockBlockEntity;
-import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleFlagBlockEntity;
-import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleFlagRenderer;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlockEntity;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerRenderer;
 import com.railwayteam.railways.content.custom_bogeys.blocks.base.be.CRBogeyBlockEntity;
@@ -106,11 +104,6 @@ public class CRBlockEntities {
                 CRBlocks.LARGE_CREATE_STYLE_0_6_0, CRBlocks.LARGE_CREATE_STYLE_0_8_0, CRBlocks.LARGE_CREATE_STYLE_0_10_0,
                 CRBlocks.LARGE_CREATE_STYLE_0_12_0)
             .register();
-
-    public static final BlockEntityEntry<ConductorWhistleFlagBlockEntity> CONDUCTOR_WHISTLE_FLAG = REGISTRATE.blockEntity("conductor_whistle", ConductorWhistleFlagBlockEntity::new)
-        .validBlocks(CRBlocks.CONDUCTOR_WHISTLE_FLAG)
-        .renderer(() -> ConductorWhistleFlagRenderer::new)
-        .register();
 
     public static final BlockEntityEntry<SmokeStackBlockEntity> SMOKE_STACK = REGISTRATE.blockEntity("smokestack", SmokeStackBlockEntity::new)
         .validBlocks(CRBlocks.CABOOSESTYLE_STACK, CRBlocks.LONG_STACK, CRBlocks.COALBURNER_STACK, CRBlocks.OILBURNER_STACK, CRBlocks.STREAMLINED_STACK, CRBlocks.WOODBURNER_STACK)

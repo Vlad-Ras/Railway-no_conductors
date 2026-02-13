@@ -5,7 +5,7 @@
   },
   "results": [
     {
-      "item": "railways:track_acacia_wide"
+      "id": "railways:track_acacia_wide"
     }
   ],
   "sequence": [
@@ -18,7 +18,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_acacia_wide"
+          "id": "railways:track_incomplete_acacia_wide"
         }
       ]
     },
@@ -34,7 +34,7 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_acacia_wide"
+          "id": "railways:track_incomplete_acacia_wide"
         }
       ]
     },
@@ -47,12 +47,12 @@
       ],
       "results": [
         {
-          "item": "railways:track_incomplete_acacia_wide"
+          "id": "railways:track_incomplete_acacia_wide"
         }
       ]
     }
   ],
   "transitional_item": {
-    "item": "railways:track_incomplete_acacia_wide"
+    "id": "railways:track_incomplete_acacia_wide"
   }
 }

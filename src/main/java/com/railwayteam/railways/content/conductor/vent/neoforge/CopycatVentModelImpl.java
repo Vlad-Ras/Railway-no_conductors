@@ -21,7 +21,6 @@ package com.railwayteam.railways.content.conductor.vent.neoforge;
 import com.railwayteam.railways.content.conductor.ClientHandler;
 import com.railwayteam.railways.content.conductor.vent.CopycatVentModel;
 import com.railwayteam.railways.content.conductor.vent.VentBlock;
-import com.railwayteam.railways.registry.CRBlocks;
 import com.simibubi.create.foundation.model.BakedModelHelper;
 import com.simibubi.create.foundation.model.BakedQuadHelper;
 import net.minecraft.client.renderer.RenderType;
@@ -45,7 +44,7 @@ public class CopycatVentModelImpl extends CopycatVentModel {
     @Override
     protected List<BakedQuad> getCroppedQuads(BlockState state, Direction side, RandomSource rand, BlockState material, ModelData wrappedData, RenderType renderType) {
         if (ClientHandler.isPlayerMountedOnCamera()) {
-            material = CRBlocks.CONDUCTOR_VENT.getDefaultState().setValue(VentBlock.CONDUCTOR_VISIBLE, true);
+            material = state.hasProperty(VentBlock.CONDUCTOR_VISIBLE) ? state.setValue(VentBlock.CONDUCTOR_VISIBLE, true) : state;
             BakedModel originalModel = getModelOf(material);
             if (originalModel instanceof CopycatVentModelImpl impl)
                 return impl.originalModel.getQuads(state, side, rand, wrappedData, renderType);

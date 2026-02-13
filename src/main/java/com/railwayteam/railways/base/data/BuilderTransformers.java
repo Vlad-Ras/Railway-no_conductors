@@ -26,7 +26,6 @@ import com.railwayteam.railways.content.buffer.headstock.HeadstockBlock;
 import com.railwayteam.railways.content.buffer.single_deco.GenericDyeableSingleBufferBlock;
 import com.railwayteam.railways.content.buffer.single_deco.LinkPinBlock;
 import com.railwayteam.railways.content.conductor.vent.VentBlock;
-import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleFlagBlock;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlock;
 import com.railwayteam.railways.content.custom_bogeys.blocks.base.CRBogeyBlock;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingCollisionBlock;
@@ -104,8 +103,6 @@ public class BuilderTransformers {    public static <B extends MonoBogeyBlock, P
         return com.railwayteam.railways.base.data.neoforge.BuilderTransformersImpl.trackCoupler();
     }    public static <B extends TrackSwitchBlock, P> NonNullUnaryOperator<BlockBuilder<B, P>> trackSwitch(boolean andesite) {
         return com.railwayteam.railways.base.data.neoforge.BuilderTransformersImpl.trackSwitch(andesite);
-    }    public static <B extends ConductorWhistleFlagBlock, P> NonNullUnaryOperator<BlockBuilder<B, P>> conductorWhistleFlag() {
-        return com.railwayteam.railways.base.data.neoforge.BuilderTransformersImpl.conductorWhistleFlag();
     }    public static <B extends DieselSmokeStackBlock, P> NonNullUnaryOperator<BlockBuilder<B, P>> dieselSmokeStack() {
         return com.railwayteam.railways.base.data.neoforge.BuilderTransformersImpl.dieselSmokeStack();
     }    public static <B extends VentBlock, P> NonNullUnaryOperator<BlockBuilder<B, P>> conductorVent() {

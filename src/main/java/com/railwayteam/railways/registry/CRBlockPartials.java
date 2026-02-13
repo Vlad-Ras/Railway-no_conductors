@@ -44,7 +44,6 @@ import static com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType.WID
 
 public class CRBlockPartials {
     public static final Map<DyeColor, PartialModel> TOOLBOX_BODIES = new EnumMap<>(DyeColor.class);
-    public static final Map<DyeColor, PartialModel> CONDUCTOR_WHISTLE_FLAGS = new EnumMap<>(DyeColor.class);
     public static final Map<String, PartialModel> CUSTOM_CONDUCTOR_CAPS = new HashMap<>();
     public static final Map<String, PartialModel> CUSTOM_CONDUCTOR_ONLY_CAPS = new HashMap<>();
     public static final Map<String, ResourceLocation> CUSTOM_CONDUCTOR_SKINS = new HashMap<>();
@@ -540,7 +539,6 @@ public class CRBlockPartials {
     static {
         for (DyeColor color : DyeColor.values()) {
             TOOLBOX_BODIES.put(color, createBlock(Lang.asId(color.name()) + "_toolbox"));
-            CONDUCTOR_WHISTLE_FLAGS.put(color, block("conductor_whistle/flag_"+ Lang.asId(color.name())));
         }
     }
 

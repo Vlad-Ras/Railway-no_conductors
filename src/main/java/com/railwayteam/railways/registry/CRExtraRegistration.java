@@ -18,35 +18,19 @@
 
 package com.railwayteam.railways.registry;
 
-import com.google.common.collect.ImmutableSet;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.distant_signals.SignalDisplaySource;
-import com.railwayteam.railways.mixin.AccessorBlockEntityType;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.Set;
 
 public class CRExtraRegistration {
     public static boolean registeredSignalSource = false;
     public static boolean registeredVentAsCopycat = false;
 
     public static void addVentAsCopycat(BlockEntityType<?> object) {
-        if (registeredVentAsCopycat) return;
-        Block ventBlock;
-        try {
-            ventBlock = CRBlocks.CONDUCTOR_VENT.get();
-        } catch (NullPointerException ignored) {
-            return;
-        }
-        Set<Block> validBlocks = ((AccessorBlockEntityType) object).getValidBlocks();
-        validBlocks = new ImmutableSet.Builder<Block>()
-                .add(validBlocks.toArray(Block[]::new))
-                .add(ventBlock)
-                .build();
-        ((AccessorBlockEntityType) object).setValidBlocks(validBlocks);
-        registeredVentAsCopycat = true;
+        // Vent block was removed from this fork
     }
 
     public static void addSignalSource(Block block) {
